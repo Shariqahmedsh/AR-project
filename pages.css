@@ -1,0 +1,31 @@
+/* Shared page-level styles using Tailwind @apply */
+
+.page-container {
+  @apply min-h-screen p-4 sm:p-6;
+}
+
+.card-grid {
+  @apply grid gap-6 sm:gap-8;
+}
+
+.header-wrap {
+  @apply flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8;
+}
+
+.heading-title {
+  @apply text-3xl sm:text-4xl font-bold;
+}
+
+.action-button {
+  @apply w-full sm:w-auto;
+}
+
+.ar-view-height {
+  @apply h-[52vh] sm:h-[56vh] md:h-96;
+}
+
+.game-field-height {
+  @apply h-[50vh] sm:h-[60vh] md:h-96;
+}
+
+

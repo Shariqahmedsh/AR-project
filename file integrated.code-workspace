@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../../../Downloads/Web-AR-main"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "Web-AR-main",
+		"cursor.general.globalCursorIgnoreList": [
+			"**/.env.*",
+			"**/credentials.json",
+			"**/credentials.*.json",
+			"**/secret.json",
+			"**/secrets.json",
+			"**/*.key",
+			"**/*.pem",
+			"**/*.pfx",
+			"**/*.p12",
+			"**/*.crt",
+			"**/*.cer",
+			"**/id_rsa",
+			"**/id_dsa",
+			"**/.ssh/id_*"
+		]
+	}
+}
