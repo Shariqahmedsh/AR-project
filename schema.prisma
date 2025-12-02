@@ -1,0 +1,149 @@
+// Datasource: PostgreSQL
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Generate Prisma Client
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  username String  @unique
+  email    String  @unique
+  phoneNumber String? @unique
+  password String
+  name     String?
+  role     String  @default("user") // "user" or "admin"
+  isPhoneVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  refreshTokens RefreshToken[]
+  smsVerifications SmsVerification[]
+  passwordResets PasswordReset[]
+  progress UserProgress[]
+  quizAttempts QuizAttempt[]
+  scenarioCompletions ScenarioCompletion[]
+}
+
+
+// Quiz domain models
+model QuizCategory {
+  id          Int            @id @default(autoincrement())
+  key         String         @unique // e.g., general, phishing, fake-login, weak-password, malware-usb, safe-browsing
+  title       String
+  description String?
+  questions   QuizQuestion[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model QuizQuestion {
+  id          Int           @id @default(autoincrement())
+  question    String
+  explanation String?
+  categoryId  Int
+  category    QuizCategory  @relation(fields: [categoryId], references: [id])
+  options     QuizOption[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model QuizOption {
+  id          Int          @id @default(autoincrement())
+  text        String
+  isCorrect   Boolean      @default(false)
+  questionId  Int
+  question    QuizQuestion @relation(fields: [questionId], references: [id])
+}
+
+model RefreshToken {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+}
+
+// Game content for "Phishing Email Detective"
+model PhishingEmail {
+  id         Int      @id @default(autoincrement())
+  sender     String
+  subject    String
+  content    String
+  isPhishing Boolean  @default(true)
+  indicators String[] // list of hints/indicators
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// SMS verification codes
+model SmsVerification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// Password reset codes
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// Progress tracking models
+model UserProgress {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  scenariosCompleted Int     @default(0)
+  quizzesPassed     Int     @default(0)
+  totalScore        Int     @default(0)
+  lastUpdated       DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([userId])
+}
+
+model QuizAttempt {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  categoryKey String   // e.g., "phishing", "general", etc.
+  score       Int      // number of correct answers
+  totalQuestions Int   // total questions in quiz
+  passed      Boolean  // true if score >= 80%
+  timeSpent   Int?     // time in seconds
+  answers     Json?    // store user answers for review
+  createdAt   DateTime @default(now())
+  
+  @@index([userId, categoryKey])
+}
+
+model ScenarioCompletion {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  scenarioKey String   // e.g., "phishing", "fake-login", etc.
+  completed   Boolean  @default(false)
+  score       Int?     // optional score for scenario
+  timeSpent   Int?     // time in seconds
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([userId, scenarioKey])
+}
+
+
